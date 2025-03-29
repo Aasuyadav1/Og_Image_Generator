@@ -1,4 +1,3 @@
-
 import { memo, useRef } from "react";
 import { PLATFORM_DIMENSIONS } from "@/lib/pattern-utils";
 import { Card, CardContent } from "@/components/ui/card";

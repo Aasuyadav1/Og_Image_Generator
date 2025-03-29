@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PatternSettings, PatternType, generatePatternUrl } from "@/lib/pattern-utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

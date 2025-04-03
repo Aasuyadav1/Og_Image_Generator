@@ -7,13 +7,22 @@ import { HelpCircle, Grid, Circle, Hash, TrendingUp, Hexagon, CloudFog } from "l
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+
 interface PatternSelectorProps {
-  pattern: any;
-  onChange: (pattern: any) => void;
+  pattern: {
+    patternStyle: PatternSettings;
+    background: string;
+    content: {
+      title: string;
+      subtitle: string;
+      image?: string;
+    };
+  };
+  onChange: (pattern: PatternSettings) => void;
 }
 
 const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
-  const [currentPattern, setCurrentPattern] = useState<PatternSettings>(pattern);
+  const [currentPattern, setCurrentPattern] = useState<PatternSettings>(pattern.patternStyle);
 
   const handlePatternChange = (type: PatternType) => {
     const updatedPattern = { ...currentPattern, type };
@@ -42,7 +51,6 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
   const patternPreviewStyle = {
     backgroundImage: generatePatternUrl(currentPattern),
     backgroundSize: `${currentPattern.scale * 2}px`,
-    // background: currentPattern.background,
   };
 
   return (

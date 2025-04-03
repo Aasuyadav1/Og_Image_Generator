@@ -44,11 +44,11 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
                     style={patternStyle as React.CSSProperties}
                   >
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center">
-                      {template.content.logo && (
+                      {template.content.image && (
                         <div className="mb-1 max-w-[25%] max-h-[25%]">
                           <img 
-                            src={template.content.logo} 
-                            alt="Logo" 
+                            src={template.content.image} 
+                            alt="image" 
                             className="max-h-full max-w-full object-contain" 
                           />
                         </div>

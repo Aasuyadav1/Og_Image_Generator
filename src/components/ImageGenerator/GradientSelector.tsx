@@ -9,8 +9,16 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GradientSelectorProps {
-  pattern: any;
-  onChange: (pattern: any) => void;
+  pattern: {
+    patternStyle: PatternSettings;
+    background: string;
+    content: {
+      title: string;
+      subtitle: string;
+      image?: string;
+    };
+  };
+  onChange: (newGradient: { background: string }) => void;
 }
 
 const GradientSelector = ({ pattern, onChange }: GradientSelectorProps) => {
@@ -18,28 +26,21 @@ const GradientSelector = ({ pattern, onChange }: GradientSelectorProps) => {
   const [colorStart, setColorStart] = useState("#3B82F6");
   const [colorEnd, setColorEnd] = useState("#8B5CF6");
 
-  
   const handleGradientSelect = (gradient: string) => {
-    console.log("pattern while selecring grediants", pattern)
-    const updatedPattern = { ...pattern, background: gradient };
-    console.log("updated pattern", updatedPattern)
-    onChange(updatedPattern);
+    onChange({ background: gradient });
   };
 
   const handleCustomGradientChange = () => {
     const customGradient = `linear-gradient(${gradientAngle}deg, ${colorStart} 0%, ${colorEnd} 100%)`;
-    const updatedPattern = { ...pattern, background: customGradient };
-    onChange(updatedPattern);
+    onChange({ background: customGradient });
   };
 
   const handleColorSelect = (color: string) => {
-    const updatedPattern = { ...pattern, background: color };
-    onChange(updatedPattern);
+    onChange({ background: color });
   };
 
   const handleSolidColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedPattern = { ...pattern, background: e.target.value };
-    onChange(updatedPattern);
+    onChange({ background: e.target.value });
   };
 
   const handleAngleChange = (value: number[]) => {
@@ -56,7 +57,6 @@ const GradientSelector = ({ pattern, onChange }: GradientSelectorProps) => {
     setColorEnd(e.target.value);
     setTimeout(handleCustomGradientChange, 10);
   };
-
   return (
     <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">

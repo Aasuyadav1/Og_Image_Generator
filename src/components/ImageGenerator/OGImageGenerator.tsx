@@ -1,7 +1,7 @@
+// OGImageGenerator.tsx
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
   Download,
@@ -22,69 +22,78 @@ import {
   Template,
   TEMPLATES,
 } from "@/lib/pattern-utils";
-import { PatternType } from "@/lib/pattern-utils";
 import GradientSelector from "./GradientSelector";
+
+interface OGImageState {
+  content: {
+    title: string;
+    subtitle: string;
+    image?: string;
+  };
+  patternStyle: PatternSettings;
+  background: string; // Keeping it as background as requested
+}
 
 const OGImageGenerator = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState("design");
-  const [patternUrl, setPatternUrl] = useState("");
-  const [state, setState] = useState({
+  const [patternUrl, setPatternUrl] = useState<string>("");
+  const [state, setState] = useState<OGImageState>(() => {
+    const initialState = {
+      content: {
+        title: "Create Beautiful OG Images",
+        subtitle: "Generate perfect social media previews in seconds",
+        image: undefined,
+      },
+      patternStyle: defaultPatternSettings,
+      background: "linear-gradient(225deg, #2A2A2A 0%, #121212 100%)",
+    };
+    return initialState;
+  });
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Initial state as a constant for reset
+  const initialState: OGImageState = {
     content: {
       title: "Create Beautiful OG Images",
       subtitle: "Generate perfect social media previews in seconds",
       image: undefined,
-      logo: undefined,
     },
-    patternStyle: {
-      type: "grid" as PatternType,
-      color: "#ffffff",
-      opacity: 0.1,
-      scale: 20,
-    },
+    patternStyle: defaultPatternSettings,
     background: "linear-gradient(225deg, #2A2A2A 0%, #121212 100%)",
-  });
-  const previewRef = useRef<HTMLDivElement>(null);
+  };
+
+  useEffect(() => {
+    setPatternUrl(generatePatternUrl(state.patternStyle));
+  }, [state.patternStyle]);
 
   const handleTemplateSelect = (template: Template) => {
-    console.log("this template is selected", template);
     setState({
-      ...state,
-      patternStyle: {
-        type: template.pattern.type,
-        color: template.pattern.color,
-        opacity: template.pattern.opacity,
-        scale: template.pattern.scale,
-      },
+      content: { ...template.content },
+      patternStyle: { ...template.pattern },
       background: template.background,
     });
     toast.success(`Applied template: ${template.name}`);
   };
 
   const handleResetChanges = () => {
-    setState({
-      content: {
-        title: "Create Beautiful OG Images",
-        subtitle: "Generate perfect social media previews in seconds",
-        image: undefined,
-        logo: undefined,
-      },
-      patternStyle: {
-        type: "grid" as PatternType,
-        color: "#ffffff",
-        opacity: 0.1,
-        scale: 20,
-      },
-      background: "#ffffff",
-    });
+    setState(initialState);
     toast.success("Reset to default settings");
   };
 
-  useEffect(() => {
-    const patternUri = generatePatternUrl(state.patternStyle);
+  const handlePatternChange = (newPattern: PatternSettings) => {
+    setState((prev) => ({
+      ...prev,
+      patternStyle: newPattern,
+    }));
+  };
 
-    setPatternUrl(patternUri);
-  }, [state]);
+  const handleGradientChange = (newGradient: { background: string }) => {
+    setState((prev) => ({
+      ...prev,
+      background: newGradient.background,
+    }));
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -141,27 +150,11 @@ const OGImageGenerator = () => {
                       <TabsContent value="design" className="mt-0 space-y-6">
                         <PatternSelector
                           pattern={state}
-                          onChange={(newPattern) =>
-                            setState((prev) => ({
-                              ...prev,
-                              patternStyle: {
-                                ...prev.patternStyle,
-                                patternType: newPattern.type,
-                                patternColor: newPattern.color,
-                                patternOpacity: newPattern.opacity,
-                                patternScale: newPattern.scale,
-                              },
-                            }))
-                          }
+                          onChange={handlePatternChange}
                         />
                         <GradientSelector
                           pattern={state}
-                          onChange={(newGradient) =>
-                            setState((prev) => ({
-                              ...prev,
-                              background: newGradient.background,
-                            }))
-                          }
+                          onChange={handleGradientChange}
                         />
                       </TabsContent>
 
@@ -169,24 +162,24 @@ const OGImageGenerator = () => {
                         <ContentEditor
                           title={state.content.title}
                           subtitle={state.content.subtitle}
-                          logo={state.content.logo}
+                          logo={state.content.image}
                           onTitleChange={(title) =>
-                            setState({
-                              ...state,
-                              content: { ...state.content, title },
-                            })
+                            setState((prev) => ({
+                              ...prev,
+                              content: { ...prev.content, title },
+                            }))
                           }
                           onSubtitleChange={(subtitle) =>
-                            setState({
-                              ...state,
-                              content: { ...state.content, subtitle },
-                            })
+                            setState((prev) => ({
+                              ...prev,
+                              content: { ...prev.content, subtitle },
+                            }))
                           }
                           onLogoChange={(logo) =>
-                            setState({
-                              ...state,
-                              content: { ...state.content, logo },
-                            })
+                            setState((prev) => ({
+                              ...prev,
+                              content: { ...prev.content, image: logo },
+                            }))
                           }
                         />
                       </TabsContent>
@@ -200,17 +193,29 @@ const OGImageGenerator = () => {
                   <h2 className="text-lg font-medium mb-4">Preview</h2>
                   <div
                     ref={previewRef}
-                    className="aspect-[1200/630] w-full rounded-lg overflow-hidden border border-white/10 shadow-xl animate-scale-in"
-                    style={{
-                      backgroundImage: patternUrl,
-                      background: state.background,
-                    }}
+                    className="aspect-[1200/630] w-full rounded-lg overflow-hidden border border-white/10 shadow-xl animate-scale-in relative"
                   >
-                    <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-                      {state.content.logo && (
+                    {/* Background layer */}
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: state.background }}
+                    />
+                    {/* Pattern layer */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: patternUrl,
+                        backgroundSize: `${state.patternStyle.scale * 2}px`,
+                      }}
+                    />
+                    {/* Content layer */}
+                    <div className="relative w-full h-full flex flex-col items-center justify-center p-8 text-center">
+                      {state.content.image && (
                         <div className="mb-6 max-w-[30%] max-h-[15%]">
-                          <img
-                            src={state.content.logo}
+                          <
+
+img
+                            src={state.content.image}
                             alt="Logo"
                             className="max-h-full max-w-full object-contain"
                           />
@@ -237,7 +242,7 @@ const OGImageGenerator = () => {
                       background={state.background}
                       title={state.content.title}
                       subtitle={state.content.subtitle}
-                      logo={state.content.logo}
+                      logo={state.content.image}
                       platform="twitter"
                     />
                     <PlatformPreview
@@ -246,7 +251,7 @@ const OGImageGenerator = () => {
                       background={state.background}
                       title={state.content.title}
                       subtitle={state.content.subtitle}
-                      logo={state.content.logo}
+                      logo={state.content.image}
                       platform="linkedin"
                     />
                     <PlatformPreview
@@ -255,7 +260,7 @@ const OGImageGenerator = () => {
                       background={state.background}
                       title={state.content.title}
                       subtitle={state.content.subtitle}
-                      logo={state.content.logo}
+                      logo={state.content.image}
                       platform="facebook"
                     />
                     <PlatformPreview
@@ -264,7 +269,7 @@ const OGImageGenerator = () => {
                       background={state.background}
                       title={state.content.title}
                       subtitle={state.content.subtitle}
-                      logo={state.content.logo}
+                      logo={state.content.image}
                       platform="discord"
                     />
                   </div>

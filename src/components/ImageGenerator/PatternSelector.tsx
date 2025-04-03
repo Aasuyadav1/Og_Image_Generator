@@ -8,8 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PatternSelectorProps {
-  pattern: PatternSettings;
-  onChange: (pattern: PatternSettings) => void;
+  pattern: any;
+  onChange: (pattern: any) => void;
 }
 
 const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
@@ -42,7 +42,7 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
   const patternPreviewStyle = {
     backgroundImage: generatePatternUrl(currentPattern),
     backgroundSize: `${currentPattern.scale * 2}px`,
-    background: currentPattern.background,
+    // background: currentPattern.background,
   };
 
   return (

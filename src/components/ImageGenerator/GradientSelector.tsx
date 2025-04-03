@@ -9,8 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GradientSelectorProps {
-  pattern: PatternSettings;
-  onChange: (pattern: PatternSettings) => void;
+  pattern: any;
+  onChange: (pattern: any) => void;
 }
 
 const GradientSelector = ({ pattern, onChange }: GradientSelectorProps) => {
@@ -18,8 +18,11 @@ const GradientSelector = ({ pattern, onChange }: GradientSelectorProps) => {
   const [colorStart, setColorStart] = useState("#3B82F6");
   const [colorEnd, setColorEnd] = useState("#8B5CF6");
 
+  
   const handleGradientSelect = (gradient: string) => {
+    console.log("pattern while selecring grediants", pattern)
     const updatedPattern = { ...pattern, background: gradient };
+    console.log("updated pattern", updatedPattern)
     onChange(updatedPattern);
   };
 

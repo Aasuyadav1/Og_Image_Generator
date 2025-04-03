@@ -30,7 +30,7 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
           {TEMPLATES.map((template) => {
             const patternStyle = {
               backgroundImage: generatePatternUrl(template.pattern),
-              background: template.pattern.background,
+              background: template.background,
             };
 
             return (

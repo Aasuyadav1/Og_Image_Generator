@@ -73,6 +73,8 @@ const OGImageGenerator = () => {
       patternStyle: { ...template.pattern },
       background: template.background,
     });
+
+    console.log("tempatle pater", template.pattern);
     toast.success(`Applied template: ${template.name}`);
   };
 
@@ -212,9 +214,7 @@ const OGImageGenerator = () => {
                     <div className="relative w-full h-full flex flex-col items-center justify-center p-8 text-center">
                       {state.content.image && (
                         <div className="mb-6 max-w-[30%] max-h-[15%]">
-                          <
-
-img
+                          <img
                             src={state.content.image}
                             alt="Logo"
                             className="max-h-full max-w-full object-contain"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PatternSettings, PatternType, generatePatternUrl } from "@/lib/pattern-utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -23,10 +23,18 @@ interface PatternSelectorProps {
 
 const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
   const [currentPattern, setCurrentPattern] = useState<PatternSettings>(pattern.patternStyle);
+  const [activeTab, setActiveTab] = useState<PatternType>(pattern.patternStyle.type);
+
+  // Add useEffect to sync the local state with props when they change
+  useEffect(() => {
+    setCurrentPattern(pattern.patternStyle);
+    setActiveTab(pattern.patternStyle.type);
+  }, [pattern.patternStyle]);
 
   const handlePatternChange = (type: PatternType) => {
     const updatedPattern = { ...currentPattern, type };
     setCurrentPattern(updatedPattern);
+    setActiveTab(type);
     onChange(updatedPattern);
   };
 
@@ -72,7 +80,11 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
       </div>
 
       <div className="glass-morphism rounded-lg px-4 py-8">
-        <Tabs defaultValue="grid" className="w-full " onValueChange={(value) => handlePatternChange(value as PatternType)}>
+        <Tabs 
+          value={activeTab || 'grid'} 
+          className="w-full" 
+          onValueChange={(value) => handlePatternChange(value as PatternType)}
+        >
           <TabsList className="grid !border !border-neutral-700 h-full p-2 grid-cols-6 w-full mb-4">
             <TabsTrigger value="grid" className="flex flex-col items-center gap-1.5 p-2">
               <Grid className="h-4 w-4" />
@@ -104,7 +116,7 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
             style={patternPreviewStyle as React.CSSProperties}
           />
           
-          <div className="grid grid-cols-1  gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-3">
               <div>
                 <Label htmlFor="pattern-color">Pattern Color</Label>
@@ -122,7 +134,7 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
                     type="text" 
                     value={currentPattern.color} 
                     onChange={handleColorChange}
-                    className=" bg-black/20 border border-white/10 rounded px-3 text-sm"
+                    className="bg-black/20 border border-white/10 rounded px-3 text-sm"
                   />
                 </div>
               </div>

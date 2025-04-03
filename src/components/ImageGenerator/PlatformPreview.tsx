@@ -1,4 +1,3 @@
-// PlatformPreview.tsx
 import { memo, useRef, useCallback, useState } from "react";
 import { PLATFORM_DIMENSIONS } from "@/lib/pattern-utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -82,22 +81,83 @@ const PlatformPreview = memo(({
         return { lines, lineHeight: fontSize * 1.2 };
       };
 
+      // Create a linear gradient for SVG
+      let gradientDef = '';
+      let fillStyle = background;
+      
+      // Check if background is a linear gradient
+      const gradientMatch = background.match(/linear-gradient\(([^)]+)\)/);
+      if (gradientMatch) {
+        const gradientContent = gradientMatch[1];
+        
+        // Parse angle and colors
+        let angle = '0';
+        let colors: {color: string, position: string}[] = [];
+        
+        // Parse gradient direction/angle
+        if (gradientContent.includes('deg')) {
+          const angleMatch = gradientContent.match(/(\d+)deg/);
+          if (angleMatch) {
+            angle = angleMatch[1];
+          }
+        }
+        
+        // Convert angle to x1,y1,x2,y2 coordinates
+        let x1 = '0%', y1 = '0%', x2 = '100%', y2 = '0%';
+        const numAngle = parseInt(angle);
+        
+        if (numAngle >= 0 && numAngle < 90) {
+          x1 = '0%'; y1 = '100%'; x2 = '100%'; y2 = '0%';
+        } else if (numAngle >= 90 && numAngle < 180) {
+          x1 = '0%'; y1 = '0%'; x2 = '100%'; y2 = '100%';
+        } else if (numAngle >= 180 && numAngle < 270) {
+          x1 = '100%'; y1 = '0%'; x2 = '0%'; y2 = '100%';
+        } else {
+          x1 = '100%'; y1 = '100%'; x2 = '0%'; y2 = '0%';
+        }
+        
+        // Parse color stops
+        const colorRegex = /(#[0-9A-Fa-f]+|rgb\([^)]+\)|rgba\([^)]+\))\s*(\d+%)?/g;
+        let match;
+        let i = 0;
+        
+        while ((match = colorRegex.exec(gradientContent)) !== null) {
+          const color = match[1];
+          const position = match[2] || `${i === 0 ? '0' : '100'}%`;
+          colors.push({ color, position });
+          i++;
+        }
+        
+        // Create gradient definition
+        gradientDef = `
+          <linearGradient id="backgroundGradient" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+            ${colors.map(c => `<stop offset="${c.position}" stop-color="${c.color}" />`).join('')}
+          </linearGradient>
+        `;
+        
+        fillStyle = "url(#backgroundGradient)";
+      }
+
       // Generate SVG content
       let svgContent = `
         <svg width="${renderWidth}" height="${renderHeight}" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            ${gradientDef}
+            ${patternUrl ? `
+              <pattern id="pattern" patternUnits="userSpaceOnUse" 
+                width="${patternSize}" height="${patternSize}">
+                <image href="${patternUrl}" width="${patternSize}" height="${patternSize}" />
+              </pattern>
+            ` : ''}
+          </defs>
+          
           <!-- Background -->
-          <rect width="${renderWidth}" height="${renderHeight}" fill="${background}" />
+          <rect width="${renderWidth}" height="${renderHeight}" fill="${fillStyle}" />
           
           <!-- Pattern -->
           ${patternUrl ? `
             <rect width="${renderWidth}" height="${renderHeight}" 
               fill="url(#pattern)" />
-            <defs>
-              <pattern id="pattern" patternUnits="userSpaceOnUse" 
-                width="${patternSize}" height="${patternSize}">
-                <image href="${patternUrl}" width="${patternSize}" height="${patternSize}" />
-              </pattern>
-            </defs>
           ` : ''}
       `;
 
@@ -144,24 +204,34 @@ const PlatformPreview = memo(({
 
       svgContent += `</svg>`;
 
-      // Convert SVG to PNG
+      // Create a Blob containing the SVG data
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
       const svgUrl = URL.createObjectURL(svgBlob);
+      
+      // Create an Image object to load the SVG
       const img = new Image();
       
+      // Wait for the image to load
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
-        img.onerror = () => reject(new Error("Failed to load SVG"));
+        img.onerror = (e) => {
+          console.error("Image loading error:", e);
+          reject(new Error("Failed to load SVG"));
+        };
         img.src = svgUrl;
       });
 
+      // Create a canvas with the exact platform dimensions
       const canvas = document.createElement('canvas');
       canvas.width = renderWidth;
       canvas.height = renderHeight;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error("Unable to create canvas context");
       
+      // Draw the image onto the canvas
       ctx.drawImage(img, 0, 0, renderWidth, renderHeight);
+      
+      // Clean up the object URL
       URL.revokeObjectURL(svgUrl);
 
       // Download the image
@@ -171,7 +241,7 @@ const PlatformPreview = memo(({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success(`${label} image downloaded (${quality})`);
+      toast.success(`${label} image downloaded (${quality} - ${width * scale}x${height * scale}px)`);
 
     } catch (error) {
       console.error("Error generating SVG:", error);

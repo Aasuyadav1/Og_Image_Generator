@@ -1,4 +1,9 @@
-// Pattern types
+import leffPen from "../../public/patterns/center.png"
+import RightPen from "../../public/patterns/oggen.png"
+import overlay from "../../public/patterns/overl.png"
+import center from "../../public/patterns/cen.png"
+
+
 export type PatternType =
   | "grid"
   | "dots"
@@ -258,7 +263,9 @@ export interface Template {
   content: {
     title: string;
     subtitle: string;
-    logo?: string;
+    image?: string;
+    layout: 'centered' | 'left-image' | 'right-image' | 'bottom-image' | 'top-image' | 'overlay';
+    textAlign?: 'left' | 'center' | 'right';
   };
 }
 
@@ -276,11 +283,13 @@ export const TEMPLATES: Template[] = [
     content: {
       title: "Clean & Minimal Design",
       subtitle: "Perfect for professional content",
+      layout: "centered",
+      textAlign: "center",
     },
   },
   {
-    id: "gradient",
-    name: "Gradient",
+    id: "split-right",
+    name: "Split Content",
     pattern: {
       type: "dots",
       color: "#ffffff",
@@ -289,89 +298,70 @@ export const TEMPLATES: Template[] = [
     },
     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     content: {
-      title: "Gradient Background",
-      subtitle: "Eye-catching and modern",
+      title: "Product Showcase",
+      subtitle: "Feature your product with a clean layout",
+      image: RightPen,
+      layout: "right-image",
+      textAlign: "left"
     },
   },
   {
-    id: "tech",
-    name: "Tech",
-    pattern: {
-      type: "graph",
-      color: "#00f2fe",
-      opacity: 0.2,
-      scale: 25,
-    },
-    background: "linear-gradient(90deg, #0C0F13 0%, #151A22 100%)",
-    content: {
-      title: "Technology Theme",
-      subtitle: "For tech products and services",
-    },
-  },
-  {
-    id: "geometric",
-    name: "Geometric",
-    pattern: {
-      type: "honeycomb",
-      color: "#ffffff",
-      opacity: 0.08,
-      scale: 30,
-    },
-    background: "linear-gradient(60deg, #29323c 0%, #485563 100%)",
-    content: {
-      title: "Geometric Patterns",
-      subtitle: "Modern and architectural",
-    },
-  },
-  {
-    id: "vibrant",
-    name: "Vibrant",
+    id: "featured-image",
+    name: "Featured Image",
     pattern: {
       type: "diagonal",
       color: "#ffffff",
-      opacity: 0.1,
+      opacity: 0.08,
       scale: 20,
     },
-    background: "linear-gradient(90deg, #FF416C 0%, #FF4B2B 100%)",
+    background: "linear-gradient(90deg, #0C0F13 0%, #151A22 100%)",
     content: {
-      title: "Vibrant & Energetic",
-      subtitle: "Stand out from the crowd",
+      title: "Bottom Featured Image",
+      subtitle: "Great for showcasing screenshots or products",
+      layout: "bottom-image",
+      textAlign: "center",
+      image: center
     },
   },
+  // {
+  //   id: "header-showcase",
+  //   name: "Header Image",
+  //   pattern: {
+  //     type: "honeycomb",
+  //     color: "#ffffff",
+  //     opacity: 0.07,
+  //     scale: 30,
+  //   },
+  //   background: "linear-gradient(60deg, #29323c 0%, #485563 100%)",
+  //   content: {
+  //     title: "Content Below Image",
+  //     subtitle: "Perfect for article or blog previews",
+  //     image: "/api/placeholder/900/350",
+  //     layout: "top-image",
+  //     textAlign: "center"
+  //   },
+  // },
   {
-    id: "ocean",
-    name: "Ocean",
-    pattern: {
-      type: "dots",
-      color: "#ffffff",
-      opacity: 0.12,
-      scale: 18,
-    },
-    background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
-    content: {
-      title: "Deep Ocean Theme",
-      subtitle: "Calming and professional",
-    },
-  },
-  {
-    id: "purple-haze",
-    name: "Purple Haze",
+    id: "split-left",
+    name: "Left Image",
     pattern: {
       type: "noise",
       color: "#ffffff",
       opacity: 0.07,
       scale: 30,
     },
-    background:
-      "linear-gradient(225deg, #FF057C 0%, #8D0B93 50%, #321575 100%)",
+    background: "linear-gradient(225deg, #FF057C 0%, #8D0B93 50%, #321575 100%)",
     content: {
-      title: "Purple Haze Effect",
-      subtitle: "Creative and distinctive",
+      title: "Visual First Design",
+      subtitle: "Lead with your visuals for more impact",
+      image: leffPen,
+      layout: "left-image",
+      textAlign: "right"
     },
   },
   {
-    id: "fresh",
-    name: "Fresh",
+    id: "overlay-image",
+    name: "Text Overlay",
     pattern: {
       type: "grid",
       color: "#ffffff",
@@ -380,69 +370,11 @@ export const TEMPLATES: Template[] = [
     },
     background: "linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%)",
     content: {
-      title: "Fresh & Modern Look",
-      subtitle: "Bright and optimistic design",
+      title: "Text Over Image",
+      subtitle: "Make your content stand out",
+      image: overlay,
+      layout: "overlay",
+      textAlign: "center"
     },
-  },
-  {
-    id: "midnight",
-    name: "Midnight",
-    pattern: {
-      type: "honeycomb",
-      color: "#4338CA",
-      opacity: 0.15,
-      scale: 25,
-    },
-    background: "linear-gradient(90deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
-    content: {
-      title: "Midnight Theme",
-      subtitle: "Elegant and mysterious",
-    },
-  },
-  {
-    id: "sunset",
-    name: "Sunset",
-    pattern: {
-      type: "dots",
-      color: "#ffffff",
-      opacity: 0.12,
-      scale: 20,
-    },
-    background: "linear-gradient(90deg, #f12711 0%, #f5af19 100%)",
-    content: {
-      title: "Sunset Vibes",
-      subtitle: "Warm and inviting",
-    },
-  },
-  {
-    id: "monochrome",
-    name: "Monochrome",
-    pattern: {
-      type: "grid",
-      color: "#ffffff",
-      opacity: 0.07,
-      scale: 15,
-    },
-    background: "#1A1A1A",
-
-    content: {
-      title: "Monochrome Design",
-      subtitle: "Timeless and elegant",
-    },
-  },
-  {
-    id: "teal-delight",
-    name: "Teal Delight",
-    pattern: {
-      type: "diagonal",
-      color: "#ffffff",
-      opacity: 0.1,
-      scale: 25,
-    },
-    background: "linear-gradient(90deg, #8360c3 0%, #2ebf91 100%)",
-    content: {
-      title: "Teal Delight Theme",
-      subtitle: "Fresh and professional",
-    },
-  },
+  }
 ];

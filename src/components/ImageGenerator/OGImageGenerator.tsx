@@ -1,8 +1,9 @@
-// OGImageGenerator.tsx
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import Preview from "./Preview";
 import {
   Download,
   RefreshCw,
@@ -29,9 +30,17 @@ interface OGImageState {
     title: string;
     subtitle: string;
     image?: string;
+    layout:
+      | "centered"
+      | "left-image"
+      | "right-image"
+      | "bottom-image"
+      | "top-image"
+      | "overlay";
+    textAlign?: "left" | "center" | "right";
   };
   patternStyle: PatternSettings;
-  background: string; // Keeping it as background as requested
+  background: string;
 }
 
 const OGImageGenerator = () => {
@@ -44,6 +53,8 @@ const OGImageGenerator = () => {
         title: "Create Beautiful OG Images",
         subtitle: "Generate perfect social media previews in seconds",
         image: undefined,
+        layout: "centered" as const,
+        textAlign: "center" as const,
       },
       patternStyle: defaultPatternSettings,
       background: "linear-gradient(225deg, #2A2A2A 0%, #121212 100%)",
@@ -58,6 +69,8 @@ const OGImageGenerator = () => {
       title: "Create Beautiful OG Images",
       subtitle: "Generate perfect social media previews in seconds",
       image: undefined,
+      layout: "centered",
+      textAlign: "center",
     },
     patternStyle: defaultPatternSettings,
     background: "linear-gradient(225deg, #2A2A2A 0%, #121212 100%)",
@@ -74,7 +87,6 @@ const OGImageGenerator = () => {
       background: template.background,
     });
 
-    console.log("tempatle pater", template.pattern);
     toast.success(`Applied template: ${template.name}`);
   };
 
@@ -95,6 +107,201 @@ const OGImageGenerator = () => {
       ...prev,
       background: newGradient.background,
     }));
+  };
+
+  const handleLayoutChange = (layout: OGImageState["content"]["layout"]) => {
+    setState((prev) => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        layout,
+      },
+    }));
+  };
+
+  const handleTextAlignChange = (textAlign: "left" | "center" | "right") => {
+    setState((prev) => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        textAlign,
+      },
+    }));
+  };
+
+  const renderPreviewContent = () => {
+    const { layout, title, subtitle, image, textAlign } = state.content;
+
+    // Common text styles
+    const titleClass = `font-bold text-white leading-tight mb-3 transition-all ${
+      textAlign === "left"
+        ? "text-left"
+        : textAlign === "right"
+        ? "text-right"
+        : "text-center"
+    }`;
+    const subtitleClass = `text-white/80 transition-all ${
+      textAlign === "left"
+        ? "text-left"
+        : textAlign === "right"
+        ? "text-right"
+        : "text-center"
+    }`;
+
+    switch (layout) {
+      case "left-image":
+        return (
+          <div className="flex flex-row h-full w-full">
+            {image && (
+              <div className="w-1/2 mt-14 h-full flex items-center justify-center">
+                <img
+                  src={image}
+                  alt="Featured"
+                  className="h-full max-w-full object-right object-cover rounded-tr-xl"
+                />
+              </div>
+            )}
+            <div
+              className={`${
+                image ? "w-1/2" : "w-full"
+              } h-full flex flex-col justify-center p-8`}
+            >
+              <h2
+                className={`text-xl !text-left sm:text-2xl md:text-3xl ${titleClass}`}
+              >
+                {title}
+              </h2>
+              <p className={`text-sm !text-left sm:text-base ${subtitleClass}`}>
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        );
+
+      case "right-image":
+        return (
+          <div className="flex flex-row h-full w-full">
+            <div
+              className={`${
+                image ? "w-1/2" : "w-full"
+              } h-full flex flex-col justify-center p-8`}
+            >
+              <h2
+                className={`text-xl !text-left sm:text-2xl md:text-3xl ${titleClass}`}
+              >
+                {title}
+              </h2>
+              <p className={`text-sm !text-left sm:text-base ${subtitleClass}`}>
+                {subtitle}
+              </p>
+            </div>
+            {image && (
+              <div className="w-1/2 h-full flex items-center justify-center mt-14">
+                <img
+                  src={image}
+                  alt="Featured"
+                  className="h-full w-full object-left object-cover rounded-tl-xl"
+                />
+              </div>
+            )}
+          </div>
+        );
+
+      case "bottom-image":
+        return (
+          <div className="flex flex-col h-full w-full">
+            <div className="flex-1 flex flex-col justify-center p-8">
+              <h2
+                className={`text-xl sm:text-2xl !text-center md:text-3xl ${titleClass}`}
+              >
+                {title}
+              </h2>
+              <p
+                className={`text-sm sm:text-base !text-center ${subtitleClass}`}
+              >
+                {subtitle}
+              </p>
+            </div>
+            {image && (
+              <div className="w-full mt-0 flex items-center justify-center ">
+                <img
+                  src={image}
+                  alt="Featured"
+                  className="w-[95%] object-cover h-full rounded-t-xl"
+                />
+              </div>
+            )}
+          </div>
+        );
+
+      case "top-image":
+        return (
+          <div className="flex flex-col h-full w-full">
+            {image && (
+              <div className="w-full mb-auto">
+                <img
+                  src={image}
+                  alt="Featured"
+                  className="w-full object-cover"
+                  style={{ maxHeight: "50%" }}
+                />
+              </div>
+            )}
+            <div className="flex-1 flex flex-col justify-center p-8">
+              <h2 className={`text-xl sm:text-2xl md:text-3xl ${titleClass}`}>
+                {title}
+              </h2>
+              <p className={`text-sm sm:text-base ${subtitleClass}`}>
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        );
+
+      case "overlay":
+        return (
+          <div className="relative h-full w-full">
+            {image && (
+              <img
+                src={image}
+                alt="Background"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-black/50"></div>
+            <div className="relative flex flex-col h-full w-full items-center justify-center p-8 text-center">
+              <h2 className={`text-xl sm:text-2xl md:text-3xl ${titleClass}`}>
+                {title}
+              </h2>
+              <p className={`text-sm sm:text-base ${subtitleClass}`}>
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        );
+
+      case "centered":
+      default:
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
+            {image && (
+              <div className="mb-6 max-w-[30%] max-h-[15%]">
+                <img
+                  src={image}
+                  alt="Logo"
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            )}
+            <h2 className={`text-xl sm:text-2xl md:text-3xl ${titleClass}`}>
+              {title}
+            </h2>
+            <p className={`text-sm sm:text-base ${subtitleClass}`}>
+              {subtitle}
+            </p>
+          </div>
+        );
+    }
   };
 
   return (
@@ -135,7 +342,7 @@ const OGImageGenerator = () => {
           </div>
         </div>
 
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-6 ">
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div
@@ -146,6 +353,7 @@ const OGImageGenerator = () => {
                     <TabsList className="w-full grid grid-cols-2">
                       <TabsTrigger value="design">Design</TabsTrigger>
                       <TabsTrigger value="content">Content</TabsTrigger>
+                      {/* <TabsTrigger value="layout">Layout</TabsTrigger> */}
                     </TabsList>
 
                     <div className="p-6">
@@ -185,24 +393,60 @@ const OGImageGenerator = () => {
                           }
                         />
                       </TabsContent>
+
+                      {/* <TabsContent value="layout" className="mt-0 space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium mb-3">Layout Style</h3>
+                          <div className="grid grid-cols-2 gap-2">
+                            {(['centered', 'left-image', 'right-image', 'bottom-image', 'top-image', 'overlay'] as const).map((layout) => (
+                              <Button 
+                                key={layout}
+                                variant={state.content.layout === layout ? "default" : "outline"}
+                                size="sm"
+                                className="justify-start"
+                                onClick={() => handleLayoutChange(layout)}
+                              >
+                                {layout.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium mb-3">Text Alignment</h3>
+                          <div className="flex gap-2">
+                            {(['left', 'center', 'right'] as const).map((align) => (
+                              <Button 
+                                key={align}
+                                variant={state.content.textAlign === align ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => handleTextAlignChange(align)}
+                              >
+                                {align.charAt(0).toUpperCase() + align.slice(1)}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </TabsContent> */}
                     </div>
                   </Tabs>
                 </div>
               </div>
 
-              <div className="lg:col-span-7">
-                <div className="mb-6 sticky top-0">
-                  <h2 className="text-lg font-medium mb-4">Preview</h2>
+              <div className="lg:col-span-7 relative h-full">
+                <h2 className="text-lg font-medium ">Preview</h2>
+                <div
+                  className="sticky top-4 mb-4 mt-4 bg-background"
+                  style={{ position: "-webkit-sticky" }}
+                >
                   <div
                     ref={previewRef}
                     className="aspect-[1200/630] w-full rounded-lg overflow-hidden border border-white/10 shadow-xl animate-scale-in relative"
                   >
-                    {/* Background layer */}
                     <div
                       className="absolute inset-0"
                       style={{ background: state.background }}
                     />
-                    {/* Pattern layer */}
                     <div
                       className="absolute inset-0"
                       style={{
@@ -210,28 +454,43 @@ const OGImageGenerator = () => {
                         backgroundSize: `${state.patternStyle.scale * 2}px`,
                       }}
                     />
-                    {/* Content layer */}
-                    <div className="relative w-full h-full flex flex-col items-center justify-center p-8 text-center">
-                      {state.content.image && (
-                        <div className="mb-6 max-w-[30%] max-h-[15%]">
-                          <img
-                            src={state.content.image}
-                            alt="Logo"
-                            className="max-h-full max-w-full object-contain"
-                          />
-                        </div>
-                      )}
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight mb-3 transition-all">
-                        {state.content.title}
-                      </h2>
-                      <p className="text-sm sm:text-base text-white/80 transition-all">
-                        {state.content.subtitle}
-                      </p>
+                    <div className="relative w-full h-full">
+                      {renderPreviewContent()}
                     </div>
                   </div>
+                  <div className="mt-3 glass-morphism rounded-lg border border-white/10 p-4">
+                  <h3 className="text-lg font-medium mb-2">About OG Images</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Open Graph (OG) images are essential for creating engaging
+                    social media previews when your content is shared online.
+                  </p>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex gap-2 items-start">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>
+                        OG images appear when your content is shared on
+                        platforms like Twitter, Facebook, LinkedIn, and Discord.
+                      </span>
+                    </li>
+                    {/* <li className="flex gap-2 items-start">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>
+                        The standard size for OG images is 1200×630 pixels,
+                        which provides optimal display across platforms.
+                      </span>
+                    </li> */}
+                    <li className="flex gap-2 items-start">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>
+                        High-quality OG images can significantly increase
+                        engagement and click-through rates for your content.
+                      </span>
+                    </li>
+                  </ul>
                 </div>
-
-                <div className="space-y-4 animate-slide-up">
+                </div>
+              
+                {/* <div className="space-y-4 animate-slide-up">
                   <h3 className="text-base font-medium mb-3">
                     Platform Previews
                   </h3>
@@ -273,7 +532,7 @@ const OGImageGenerator = () => {
                       platform="discord"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

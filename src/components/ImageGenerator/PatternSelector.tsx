@@ -149,7 +149,7 @@ const PatternSelector = ({ pattern, onChange }: PatternSelectorProps) => {
                 <Slider 
                   id="pattern-opacity"
                   min={0.01} 
-                  max={0.5} 
+                  max={0.3} 
                   step={0.01} 
                   value={[currentPattern.opacity]} 
                   onValueChange={handleOpacityChange}

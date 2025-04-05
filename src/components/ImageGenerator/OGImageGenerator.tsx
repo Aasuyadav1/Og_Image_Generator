@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import Preview from "./Preview";
 import {
   Download,
   RefreshCw,
@@ -24,6 +23,7 @@ import {
   TEMPLATES,
 } from "@/lib/pattern-utils";
 import GradientSelector from "./GradientSelector";
+import ImagePreview from "./ImagePreview";
 
 interface OGImageState {
   content: {
@@ -434,7 +434,7 @@ const OGImageGenerator = () => {
               </div>
 
               <div className="lg:col-span-7 relative h-full">
-                <h2 className="text-lg font-medium ">Preview</h2>
+                {/* <h2 className="text-lg font-medium ">Preview</h2>
                 <div
                   className="sticky top-4 mb-4 mt-4 bg-background"
                   style={{ position: "-webkit-sticky" }}
@@ -458,38 +458,46 @@ const OGImageGenerator = () => {
                       {renderPreviewContent()}
                     </div>
                   </div>
+                  <ImagePreview
+                  content={state.content}
+                  patternStyle={state.patternStyle}
+                  background={state.background}
+                  patternUrl={patternUrl}
+                />
                   <div className="mt-6 glass-morphism rounded-lg border border-white/10 p-4">
-                  <h3 className="text-lg font-medium mb-2">About OG Images</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Open Graph (OG) images are essential for creating engaging
-                    social media previews when your content is shared online.
-                  </p>
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li className="flex gap-2 items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-                      <span>
-                        OG images appear when your content is shared on
-                        platforms like Twitter, Facebook, LinkedIn, and Discord.
-                      </span>
-                    </li>
-                    {/* <li className="flex gap-2 items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-                      <span>
-                        The standard size for OG images is 1200×630 pixels,
-                        which provides optimal display across platforms.
-                      </span>
-                    </li> */}
-                    <li className="flex gap-2 items-start">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-                      <span>
-                        High-quality OG images can significantly increase
-                        engagement and click-through rates for your content.
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-                </div>
-              
+                    <h3 className="text-lg font-medium mb-2">
+                      About OG Images
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Open Graph (OG) images are essential for creating engaging
+                      social media previews when your content is shared online.
+                    </p>
+                    <ul className="text-sm text-muted-foreground space-y-2">
+                      <li className="flex gap-2 items-start">
+                        <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                        <span>
+                          OG images appear when your content is shared on
+                          platforms like Twitter, Facebook, LinkedIn, and
+                          Discord.
+                        </span>
+                      </li>
+                      <li className="flex gap-2 items-start">
+                        <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                        <span>
+                          High-quality OG images can significantly increase
+                          engagement and click-through rates for your content.
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div> */}
+                <ImagePreview
+                  content={state.content}
+                  patternStyle={state.patternStyle}
+                  background={state.background}
+                  patternUrl={patternUrl}
+                />
+
                 {/* <div className="space-y-4 animate-slide-up">
                   <h3 className="text-base font-medium mb-3">
                     Platform Previews

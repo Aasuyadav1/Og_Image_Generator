@@ -307,7 +307,7 @@ const OGImageGenerator = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between p-6 border-b border-white/10">
+        {/* <header className="flex items-center justify-between p-6 border-b border-white/10">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -333,7 +333,7 @@ const OGImageGenerator = () => {
               <span className="hidden sm:inline">Reset</span>
             </Button>
           </div>
-        </header>
+        </header> */}
 
         <div className="p-6 pb-0">
           <div className="max-w-screen-xl mx-auto">
@@ -458,7 +458,7 @@ const OGImageGenerator = () => {
                       {renderPreviewContent()}
                     </div>
                   </div>
-                  <div className="mt-3 glass-morphism rounded-lg border border-white/10 p-4">
+                  <div className="mt-6 glass-morphism rounded-lg border border-white/10 p-4">
                   <h3 className="text-lg font-medium mb-2">About OG Images</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Open Graph (OG) images are essential for creating engaging

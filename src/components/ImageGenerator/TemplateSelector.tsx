@@ -32,8 +32,8 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
         return (
           <div className="flex flex-row h-full w-full">
             {image && (
-              <div className="w-1/2 h-full flex items-center justify-center">
-                <img src={image} alt="Featured" className="h-full w-full object-cover" />
+              <div className="w-1/2 h-full flex items-center justify-center mt-4">
+                <img src={image} alt="Featured" className="h-full w-full object-right object-cover rounded-tr-xl" />
               </div>
             )}
             <div className={`${image ? 'w-1/2' : 'w-full'} h-full flex flex-col justify-center *:!text-left p-2`}>
@@ -51,8 +51,8 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
               <p className={subtitleClass}>{subtitle}</p>
             </div>
             {image && (
-              <div className="w-1/2 h-full flex items-center justify-center">
-                <img src={image} alt="Featured" className="h-full w-full object-cover" />
+              <div className="w-1/2 h-full mt-4 flex items-center justify-center -z-0">
+                <img src={image} alt="Featured" className="h-full w-full object-left object-cover rounded-tl-xl" />
               </div>
             )}
           </div>
@@ -67,7 +67,7 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
             </div>
             {image && (
               <div className="w-full h-1/2 flex items-center justify-center">
-                <img src={image} alt="Featured" className="w-full h-full object-cover" />
+                <img src={image} alt="Featured" className="w-[95%] object-cover h-full rounded-t-xl" />
               </div>
             )}
           </div>
@@ -137,16 +137,16 @@ const TemplateSelector = ({ onSelectTemplate }: TemplateSelectorProps) => {
             return (
               <CarouselItem key={template.id} className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/4">
                 <Card 
-                  className="overflow-hidden cursor-pointer border-white/10 hover:border-white/30 transition-all duration-200 transform hover:scale-[1.02]"
+                  className="overflow-hidden cursor-pointer border-white/10 hover:border-white/30"
                   onClick={() => onSelectTemplate(template)}
                 >
                   <div 
-                    className="h-32 relative"
+                    className="h-32 relative overflow-hidden"
                     style={patternStyle as React.CSSProperties}
                   >
                     {renderTemplateContent(template)}
                   </div>
-                  <CardContent className="p-3 bg-black/40 flex items-center justify-between">
+                  <CardContent className="p-3 bg-black/40 flex items-center justify-between !z-[9999]">
                     <p className="text-xs">{template.name}</p>
                     <Button 
                       variant="ghost" 

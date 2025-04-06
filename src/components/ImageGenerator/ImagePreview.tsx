@@ -214,7 +214,7 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
           fillStyle = "url(#backgroundGradient)";
         }
 
-        // Base SVG structure
+        // Base SVG structure with clip paths for border radius
         let svgContent = `
           <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -225,6 +225,17 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
                   <image href="${patternUrlExtracted}" width="${patternSize}" height="${patternSize}" />
                 </pattern>
               ` : ""}
+              
+              <!-- Define clip paths for image border radius -->
+              <clipPath id="roundedTopRight">
+                <rect x="0" y="0" width="100%" height="100%" rx="12" ry="12" />
+              </clipPath>
+              <clipPath id="roundedTopLeft">
+                <rect x="0" y="0" width="100%" height="100%" rx="12" ry="12" />
+              </clipPath>
+              <clipPath id="roundedTop">
+                <rect x="0" y="0" width="100%" height="100%" rx="12" ry="12" />
+              </clipPath>
             </defs>
             <rect width="${width}" height="${height}" fill="${fillStyle}" />
             ${patternUrlExtracted ? `<rect width="${width}" height="${height}" fill="url(#pattern)" />` : ""}
@@ -237,8 +248,12 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
         switch (layout) {
           case "left-image": {
             if (imageBase64) {
-              // Apply marginTop to the image positioning
-              svgContent += `<image href="${imageBase64}" x="0" y="${marginTop}" width="${width / 2}" height="${height - marginTop}" preserveAspectRatio="xMaxYMid slice" />`;
+              // Apply marginTop to the image positioning and use clip path for rounded corners
+              svgContent += `
+                <g clip-path="url(#roundedTopRight)">
+                  <image href="${imageBase64}" x="0" y="${marginTop}" width="${width / 2}" height="${height - marginTop}" preserveAspectRatio="xMaxYMid slice" />
+                </g>
+              `;
             }
             const textX = imageBase64 ? width / 2 + padding : padding;
             const textWidth = imageBase64 ? width / 2 - padding * 2 : width - padding * 2;
@@ -288,17 +303,25 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
               `;
             });
             if (imageBase64) {
-              // Apply marginTop to the image positioning
-              svgContent += `<image href="${imageBase64}" x="${width / 2}" y="${marginTop}" width="${width / 2}" height="${height - marginTop}" preserveAspectRatio="xMinYMid slice" />`;
+              // Apply marginTop to the image positioning and use clip path for rounded corners
+              svgContent += `
+                <g clip-path="url(#roundedTopLeft)">
+                  <image href="${imageBase64}" x="${width / 2}" y="${marginTop}" width="${width / 2}" height="${height - marginTop}" preserveAspectRatio="xMinYMid slice" />
+                </g>
+              `;
             }
             break;
           }
           case "bottom-image": {
-            const textHeight = imageBase64 ? height / 2 : height;
+            // Calculate better proportions so the image doesn't sit too low
+            const textHeight = imageBase64 ? height * 0.55 : height; // Slightly larger text area (55% instead of 50%)
+            const imageHeight = imageBase64 ? height * 0.45 : 0; // Smaller image area (45% instead of 50%)
+            
             const { lines: titleLines, lineHeight: titleLineHeight } = wrapText(title, width - padding * 2, titleFontSize);
             const { lines: subtitleLines, lineHeight: subtitleLineHeight } = wrapText(subtitle, width - padding * 2, subtitleFontSize);
             const totalTextHeight = titleLines.length * titleLineHeight + subtitleLines.length * subtitleLineHeight + 20;
             const textYStart = (textHeight - totalTextHeight) / 2;
+            
             titleLines.forEach((line, i) => {
               svgContent += `
                 <text x="${width / 2}" y="${textYStart + i * titleLineHeight}" 
@@ -316,7 +339,12 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
               `;
             });
             if (imageBase64) {
-              svgContent += `<image href="${imageBase64}" x="${width * 0.025}" y="${height / 2}" width="${width * 0.95}" height="${height / 2}" preserveAspectRatio="xMidYMid slice" />`;
+              // Position the image at the calculated position, adding rounded corners with clip path
+              svgContent += `
+                <g clip-path="url(#roundedTop)">
+                  <image href="${imageBase64}" x="${width * 0.025}" y="${textHeight}" width="${width * 0.95}" height="${imageHeight}" preserveAspectRatio="xMidYMid slice" />
+                </g>
+              `;
             }
             break;
           }
@@ -330,19 +358,24 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
             const { lines: subtitleLines, lineHeight: subtitleLineHeight } = wrapText(subtitle, width - padding * 2, subtitleFontSize);
             const totalTextHeight = titleLines.length * titleLineHeight + subtitleLines.length * subtitleLineHeight + 20;
             const textYStart = textYStartOffset + (textHeight - totalTextHeight) / 2;
+            
+            // Add text alignment support based on textAlign prop
+            const textAnchor = textAlign === "left" ? "start" : textAlign === "right" ? "end" : "middle";
+            const xPos = textAlign === "left" ? padding : textAlign === "right" ? width - padding : width / 2;
+            
             titleLines.forEach((line, i) => {
               svgContent += `
-                <text x="${width / 2}" y="${textYStart + i * titleLineHeight}" 
+                <text x="${xPos}" y="${textYStart + i * titleLineHeight}" 
                   font-family="Inter, sans-serif" font-size="${titleFontSize}" 
-                  font-weight="bold" fill="white" text-anchor="${textAlign === "left" ? "start" : textAlign === "right" ? "end" : "middle"}" 
+                  font-weight="bold" fill="white" text-anchor="${textAnchor}" 
                   dominant-baseline="middle">${escapeHtml(line)}</text>
               `;
             });
             subtitleLines.forEach((line, i) => {
               svgContent += `
-                <text x="${width / 2}" y="${textYStart + titleLines.length * titleLineHeight + 20 + i * subtitleLineHeight}" 
+                <text x="${xPos}" y="${textYStart + titleLines.length * titleLineHeight + 20 + i * subtitleLineHeight}" 
                   font-family="Inter, sans-serif" font-size="${subtitleFontSize}" 
-                  fill="rgba(255, 255, 255, 0.8)" text-anchor="${textAlign === "left" ? "start" : textAlign === "right" ? "end" : "middle"}" 
+                  fill="rgba(255, 255, 255, 0.8)" text-anchor="${textAnchor}" 
                   dominant-baseline="middle">${escapeHtml(line)}</text>
               `;
             });
@@ -447,7 +480,7 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
 
           const link = document.createElement("a");
           link.download = `og-image.${format}`;
-          link.href = canvas.toDataURL(`image/${format}`, 1.0);
+          link.href = canvas.toDataURL(`image/${format}`, format === "jpeg" ? 0.95 : 1.0); // Higher quality for JPEG
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -473,7 +506,23 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
 
   return (
     <div className="relative h-full">
-      <h2 className="text-lg font-medium">Preview</h2>
+      <div className="w-full justify-between flex items-center">
+      <h2 className="text-lg font-medium w-fit inline-block">Preview</h2>
+      <div className="flex gap-2 w-fit">
+          {/* <Button onClick={() => downloadImage("svg")} className="gap-1.5">
+            <Download className="h-4 w-4" />
+            SVG
+          </Button> */}
+          <Button onClick={() => downloadImage("png")} className="gap-1.5 !py-1 !px-4">
+            <Download className="h-2 w-2" />
+            PNG
+          </Button>
+          <Button onClick={() => downloadImage("jpeg")} className="gap-1.5 !py-1 !px-4">
+            <Download className="h-2 w-2" />
+            JPEG
+          </Button>
+        </div>
+      </div>
       <div className="sticky top-4 mb-4 mt-4 bg-background" style={{ position: "-webkit-sticky" }}>
         <div
           ref={previewRef}
@@ -489,7 +538,7 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
           />
           <div className="relative w-full h-full">{renderPreviewContent()}</div>
         </div>
-        <div className="flex gap-2 mt-4">
+        {/* <div className="flex gap-2 mt-4">
           <Button onClick={() => downloadImage("svg")} className="gap-1.5">
             <Download className="h-4 w-4" />
             SVG
@@ -502,7 +551,7 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
             <Download className="h-4 w-4" />
             JPEG
           </Button>
-        </div>
+        </div> */}
         <div className="mt-6 glass-morphism rounded-lg border border-white/10 p-4">
           <h3 className="text-lg font-medium mb-2">About OG Images</h3>
           <p className="text-sm text-muted-foreground mb-3">
@@ -515,12 +564,12 @@ const ImagePreview = ({ content, patternStyle, background, patternUrl }: ImagePr
             </li>
             <li className="flex gap-2 items-start">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-              <span>Supported formats: SVG (vector), PNG, and JPEG.</span>
+              <span>Supported formats: PNG, and JPEG.</span>
             </li>
-            <li className="flex gap-2 items-start">
+            {/* <li className="flex gap-2 items-start">
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
               <span>High-quality downloads ensure crisp visuals across platforms.</span>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

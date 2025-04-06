@@ -314,7 +314,7 @@ export const TEMPLATES: Template[] = [
       opacity: 0.08,
       scale: 20,
     },
-    background: "linear-gradient(90deg, #0C0F13 0%, #151A22 100%)",
+    background: "linear-gradient(90deg, #8E2DE2 0%, #4A00E0 100%)",
     content: {
       title: "Bottom Featured Image",
       subtitle: "Great for showcasing screenshots or products",
@@ -345,12 +345,12 @@ export const TEMPLATES: Template[] = [
     id: "split-left",
     name: "Left Image",
     pattern: {
-      type: "noise",
+      type: "dots",
       color: "#ffffff",
       opacity: 0.07,
       scale: 30,
     },
-    background: "linear-gradient(225deg, #FF057C 0%, #8D0B93 50%, #321575 100%)",
+    background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
     content: {
       title: "Visual First Design",
       subtitle: "Lead with your visuals for more impact",

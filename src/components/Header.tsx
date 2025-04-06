@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="w-full max-w-screen-xl mt-6 mx-auto py-6 px-4 glass-morphism rounded-lg mb-8 animate-fade-in">
+    <header className="w-full max-w-screen-xl mx-auto mt-6  py-6 px-4 glass-morphism rounded-lg mb-8 animate-fade-in">
       <div className="container mx-auto">
         <div className="flex flex-col items-center justify-center space-y-2">
           <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-[#4a90e2]/10 text-[#4a90e2] text-xs font-medium mb-2">

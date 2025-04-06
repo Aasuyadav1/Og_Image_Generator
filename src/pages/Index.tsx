@@ -5,11 +5,11 @@ import InfoSection from "@/components/InfoSection";
 
 const Index = () => {
   return (
-    <>
+    <main className="!w-full">
       <Header />
       <OGImageGenerator />
       <InfoSection />
-    </>
+    </main>
   );
 };
 

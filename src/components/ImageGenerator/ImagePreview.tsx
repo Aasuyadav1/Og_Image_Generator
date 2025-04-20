@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { PatternSettings } from "@/lib/pattern-utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import TemplateSelector from "./TemplateSelector";
 
 interface ImagePreviewProps {
   content: {
@@ -21,6 +28,7 @@ interface ImagePreviewProps {
   patternStyle: PatternSettings;
   background: string;
   patternUrl: string;
+  onSelectTemplate: (template: any) => void;
 }
 
 const ImagePreview = ({
@@ -28,6 +36,7 @@ const ImagePreview = ({
   patternStyle,
   background,
   patternUrl,
+  onSelectTemplate,
 }: ImagePreviewProps) => {
   const previewRef = useRef<HTMLImageElement>(null);
   const [previewSrc, setPreviewSrc] = useState<string>("");
@@ -224,7 +233,7 @@ const ImagePreview = ({
   </mask>
   
   <mask id="bottomImageRoundMask">
-    <rect width="${width}" height="${height}" fill="black" />
+    <rect width="${width}" height="${height}" y="${100}" fill="black" />
     <path d="
       M ${width * 0.025} ${height * 0.55 + borderRadius}
       Q ${width * 0.025} ${height * 0.55} ${width * 0.025 + borderRadius} ${
@@ -348,8 +357,9 @@ const ImagePreview = ({
           break;
         }
         case "bottom-image": {
-          const textHeight = imageBase64 ? height * 0.55 : height;
-          const imageHeight = imageBase64 ? height * 0.45 : 0;
+          const textHeight = 400 * 0.3; // 30% of height for text
+          const imageHeight = 450 * 0.9; // 70% of height for image
+          const gap = isPreview ? 0 : 16; // 4px gap in preview, 16px in download
           const { lines: titleLines, lineHeight: titleLineHeight } =
             await wrapText(title, width - padding * 2, titleFontSize);
           const { lines: subtitleLines, lineHeight: subtitleLineHeight } =
@@ -358,7 +368,7 @@ const ImagePreview = ({
             titleLines.length * titleLineHeight +
             subtitleLines.length * subtitleLineHeight +
             (isPreview ? 6 : 20);
-          const textYStart = (textHeight - totalTextHeight) / 2;
+          const textYStart = (textHeight - totalTextHeight) / 2; // Center text in its 30% area
           titleLines.forEach((line, i) => {
             svgContent += `
               <text x="${width / 2}" y="${
@@ -381,14 +391,37 @@ const ImagePreview = ({
             `;
           });
           if (imageBase64) {
-            // Use mask to create rounded rectangle for image
+            // Image starts after text with small gap and extends to bottom
+            const imageYStart = textHeight + gap;
+            const imageHeight = height - imageYStart; // Extend to bottom
+
+            // Update mask to only round top corners
+            svgContent = svgContent.replace(
+              '<mask id="bottomImageRoundMask">',
+              `<mask id="bottomImageRoundMask">
+                <rect width="${width}" height="${height}" fill="black" />
+                <path d="
+                  M ${width * 0.025} ${imageYStart + borderRadius}
+                  Q ${width * 0.025} ${imageYStart} ${
+                width * 0.025 + borderRadius
+              } ${imageYStart}
+                  H ${width * 0.975 - borderRadius}
+                  Q ${width * 0.975} ${imageYStart} ${width * 0.975} ${
+                imageYStart + borderRadius
+              }
+                  V ${height}
+                  H ${width * 0.025}
+                  Z
+                " fill="white" />`
+            );
+
             svgContent += `
               <g mask="url(#bottomImageRoundMask)">
                 <image href="${imageBase64}" x="${
               width * 0.025
-            }" y="${textHeight}" width="${
+            }" y="${imageYStart}" width="${
               width * 0.95
-            }" height="${imageHeight * 3}" preserveAspectRatio="xMidYMid slice" />
+            }" height="${imageHeight}" preserveAspectRatio="xMidYMid slice" />
               </g>
             `;
           }
@@ -630,27 +663,31 @@ const ImagePreview = ({
       <div className="w-full justify-between flex items-center">
         <h2 className="text-lg font-medium w-fit inline-block">Preview</h2>
         <div className="flex gap-2 w-fit">
-          <Button
-            onClick={() => downloadImage("svg")}
-            className="gap-1.5 !py-1 !px-4"
-          >
-            <Download className="h-2 w-2" />
-            SVG
-          </Button>
-          <Button
-            onClick={() => downloadImage("png")}
-            className="gap-1.5 !py-1 !px-4"
-          >
-            <Download className="h-2 w-2" />
-            PNG
-          </Button>
-          <Button
-            onClick={() => downloadImage("jpeg")}
-            className="gap-1.5 !py-1 !px-4"
-          >
-            <Download className="h-2 w-2" />
-            JPEG
-          </Button>
+          <div className="flex gap-2 w-fit">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="!ring-none" asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 focus:ring-0 focus:border-0 focus:outline-none focus:ring-offset-0 focus-visible:ring-0"
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Download
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => downloadImage("svg")}>
+                  SVG
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => downloadImage("png")}>
+                  PNG
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => downloadImage("jpeg")}>
+                  JPEG
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
       <div
@@ -663,8 +700,8 @@ const ImagePreview = ({
           alt="Preview"
           className="aspect-[1200/630] w-full rounded-lg overflow-hidden border border-white/10 shadow-xl animate-scale-in"
         />
-        <div className="mt-6 glass-morphism rounded-lg border border-white/10 p-4">
-          <h3 className="text-lg font-medium mb-2">About OG Images</h3>
+        <div className="mt-6 glass-morphism rounded-lg border border-white/10 pt-4 px-4 pb-2">
+          {/* <h3 className="text-lg font-medium mb-2">About OG Images</h3>
           <p className="text-sm text-muted-foreground mb-3">
             Open Graph (OG) images are essential for creating engaging social
             media previews when your content is shared online.
@@ -678,7 +715,8 @@ const ImagePreview = ({
               <CheckCircle2 className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
               <span>Supported formats: PNG, and JPEG.</span>
             </li>
-          </ul>
+          </ul> */}
+          <TemplateSelector onSelectTemplate={onSelectTemplate} />
         </div>
       </div>
     </div>

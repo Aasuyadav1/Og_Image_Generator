@@ -4,7 +4,7 @@ import { ExternalLink } from "lucide-react";
 
 const InfoSection = () => {
   return (
-    <section className="mt-14 max-w-screen-xl mx-auto mb-20 animate-fade-in">
+    <section className="mt-6 max-w-screen-xl mx-auto mb-20 animate-fade-in">
       <div className="glass-morphism rounded-lg p-8 md:p-12">
         <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
           What are OG Images?

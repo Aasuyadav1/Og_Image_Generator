@@ -335,12 +335,12 @@ const OGImageGenerator = () => {
           </div>
         </header> */}
 
-        <div className="p-6 pb-0">
+        {/* <div className="p-6 pb-0">
           <div className="max-w-screen-xl mx-auto">
             <h2 className="text-lg font-medium mb-4">Templates</h2>
             <TemplateSelector onSelectTemplate={handleTemplateSelect} />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex-1 p-6 ">
           <div className="max-w-screen-xl mx-auto">
@@ -491,11 +491,13 @@ const OGImageGenerator = () => {
                     </ul>
                   </div>
                 </div> */}
+  
                 <ImagePreview
                   content={state.content}
                   patternStyle={state.patternStyle}
                   background={state.background}
                   patternUrl={patternUrl}
+                  onSelectTemplate={handleTemplateSelect}
                 />
 
                 {/* <div className="space-y-4 animate-slide-up">
